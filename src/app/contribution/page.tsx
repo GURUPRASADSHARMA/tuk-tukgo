@@ -18,7 +18,9 @@ interface Checkpoint {
 
 const ContributionPage= () => {
 
-  const [email, setEmail] = useState('');
+  const {data:session}= useSession();
+  const userId = session?.user._id
+  console.log(userId)
   const [reason, setReason] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -31,13 +33,22 @@ const ContributionPage= () => {
     setSuccess(false);
 
     try {
-     
-// api call
+     const res =  await axios.post("/api/request-for-admin",{
+        userId,
+        reason
+      }).catch((error:any)=>{
+          if(error.response){
+            console.log(error.response.data.message)
+            setError(error.response.data.message)
+          }
+      })
 
+      console.log(res)
       setSuccess(true);
-      setEmail('');
+
       setReason('');
     } catch (err: any) {
+ 
       setError(err.message || 'Failed to submit request. Please try again.');
     } finally {
       setLoading(false);
@@ -53,7 +64,7 @@ const ContributionPage= () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const {data:session}= useSession();
+  
 
   const isAdmin = session?.user.isAdmin
 
@@ -640,7 +651,7 @@ const ContributionPage= () => {
             </div>
           ) : (
             <form onSubmit={handleSubmitRequest} className="space-y-5">
-              <div>
+              {/* <div>
                 <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
                   Email Address
                 </label>
@@ -653,7 +664,7 @@ const ContributionPage= () => {
                   className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all text-slate-800 placeholder:text-slate-400"
                   placeholder="your.email@example.com"
                 />
-              </div>
+              </div> */}
 
               <div>
                 <label htmlFor="reason" className="block text-sm font-medium text-slate-700 mb-2">

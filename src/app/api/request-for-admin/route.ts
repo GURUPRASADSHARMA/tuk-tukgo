@@ -9,16 +9,25 @@ export async function POST(req:NextRequest){
     try {
 
         const reqBody = await req.json()
-        const  {email,reason} = reqBody
+        const  {userId,reason} = reqBody
 
-        const user= await User.findOne({email:email})
+
+        const user= await User.findById(userId)
         if(!user){
-            return NextResponse.json({message:"Invalid email.please provide loggedIn email"},{status:400})
+            return NextResponse.json({message:"invalid user"},{status:400})
         }
-        const requestExist = await AdminRequest.findOne({email})
-
+        const requestExist = await AdminRequest.findOne({userId});
+        if(requestExist){
+            return NextResponse.json({message:"you have already requested"},{status:400});
+        }
+        const newRequest = await AdminRequest.create({
+            userId:user._id,
+            reason,
+        })
+        return NextResponse.json({message:"requested sucessfully",newRequest},{status:200})
 
     } catch (error) {
-        
+        console.log("something went wrong during admin requesting api",error);
+
     }
 }

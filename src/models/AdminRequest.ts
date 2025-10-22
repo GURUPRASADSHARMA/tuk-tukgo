@@ -1,24 +1,27 @@
-import mongoose ,{Schema}from "mongoose";
+import mongoose ,{ObjectId, Schema}from "mongoose";
 
 
 interface AdminRequest extends Document{
-    email?:string,
+   userId?:ObjectId,
     reason?:string,
-    createdAt?:Date
+    status?:string
 }
 
 const adminRequestSchema:Schema<AdminRequest> = new Schema({
-        email :{
-            type:String,
+        userId:{
+            type:mongoose.Schema.Types.ObjectId,
+            ref:"User",
             required:true
         },
         reason:{
             type:String,
             required:true
         },
-        createdAt:{
-            type:Date,
-            required:true
+        status:{
+            type:String,
+            enum:["pending","accepted"],
+            default:"pending"
+
         }
 },{timestamps:true})
 

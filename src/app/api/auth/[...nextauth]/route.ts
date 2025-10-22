@@ -12,6 +12,7 @@ declare module "next-auth" {
       email?: string | null;
       image?: string | null;
       isAdmin?: boolean;
+      _id?:string
     };
   }
 }
@@ -19,6 +20,7 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
   interface JWT {
     isAdmin?: boolean;
+    _id?:string
   }
 }
 
@@ -56,7 +58,7 @@ export const authOption:NextAuthOptions = {
   
         const client = await User.findOne({ email: token.email });
         token.isAdmin = client?.isAdmin || false;
-  
+        token._id = client?._id.toString();
         return token;
 },
 
@@ -64,6 +66,7 @@ export const authOption:NextAuthOptions = {
         async session({session,token}){
           if(session.user){
             session.user.isAdmin=token.isAdmin
+            session.user._id = token._id as string
           }
             return session
         }
@@ -71,11 +74,7 @@ export const authOption:NextAuthOptions = {
     session:{
         strategy:"jwt"
     }
-
-
 }
 
 const handler = NextAuth(authOption)
-
-
 export {handler as GET,handler as POST};
