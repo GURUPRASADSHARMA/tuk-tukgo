@@ -62,10 +62,10 @@ const Dashboard= () => {
   }
 
   const popularRoutes = [
-    { from: 'MG Road', to: 'Koramangala', fare: '₹85' },
-    { from: 'Brigade Road', to: 'Whitefield', fare: '₹180' },
-    { from: 'Indiranagar', to: 'Electronic City', fare: '₹220' },
-    { from: 'Jayanagar', to: 'Hebbal', fare: '₹160' },
+    { from: 'MMMUT', to: 'Golghar', fare: '₹20' },
+    { from: 'MMMUT', to: 'padleganz', fare: '₹20' },
+    { from: 'MMMUT', to: 'mohaddipur', fare: '₹15' },
+    { from: 'MMMUT', to: 'naukaBihar', fare: '₹30' },
   ];
 
   return (

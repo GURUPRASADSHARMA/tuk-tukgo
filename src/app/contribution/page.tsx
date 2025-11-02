@@ -655,7 +655,7 @@ const ContributionPage= () => {
           </div>
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
             <p className="text-blue-900 text-sm leading-relaxed text-center">
-              CONTRIBUTE YOUR OWN LOCAL AREA FAIR PRICE...
+              CONTRIBUTE YOUR OWN LOCAL AREA  AUTO-RICKSHAW FAIR PRICE...
               Help build a transparent marketplace! By contributing local price data, you empower consumers to make informed decisions and promote fair pricing in your community.
             </p>
           </div>

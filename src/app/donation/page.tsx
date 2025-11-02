@@ -4,7 +4,14 @@ import { ArrowLeft, Heart, Star, Users, Zap, Check, Gift, Crown, Currency } from
 import Link from 'next/link';
 import axios from 'axios';
 import Razorpay from 'razorpay';
+import moment from 'moment';
 
+interface recentDonar{
+  name:string,
+  avatar:string,
+  amount:string,
+  time:string
+}
 
 
 
@@ -17,6 +24,7 @@ const Donation = () => {
   const [raisedAmount,setRaisedAmount] = useState(0);
   const [donars,setDonars] =useState(0)
   const predefinedAmounts = [25,50, 100, 250, 500, 1000, 2000];
+  const [recentDonar,setRecentDonar] = useState<recentDonar[]>([]);
 
 
   const donation = async ()=>{
@@ -27,13 +35,20 @@ const Donation = () => {
 
 const recentContribution=async ()=>{
   const res = await axios.get("/api/get-recent-contribution")
-  console.log(res)
+  const {donars}=res.data
+  const formattedData = donars.map((obj:any)=>({
+    name:obj.name,
+    avatar:obj.avatar,
+    amount:obj.amount,
+    time:moment(obj.createdAt).fromNow()
+  }))
+  setRecentDonar(formattedData)
+ 
 }
 
 useEffect(()=>{
 donation();
-
-
+recentContribution()
 })
   
   const handleDonate = async () => {
@@ -136,11 +151,11 @@ razorpay.open();
     { tier: 'Legend', amount: 1000, benefits: ['All Champion benefits', 'Monthly reports', 'Feature requests'], icon: <Crown className="w-5 h-5 text-purple-500" /> },
   ];
 
-  const recentDonors = [
-    { name: 'Rahul M.', amount: '₹500', time: '2 hours ago', avatar: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&dpr=2' },
-    { name: 'Priya S.', amount: '₹250', time: '5 hours ago', avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&dpr=2' },
-    { name: 'Anonymous', amount: '₹1000', time: '1 day ago', avatar: 'https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&dpr=2' },
-  ];
+  // const recentDonors = [
+  //   { name: 'Rahul M.', amount: '₹500', time: '2 hours ago', avatar: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&dpr=2' },
+  //   { name: 'Priya S.', amount: '₹250', time: '5 hours ago', avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&dpr=2' },
+  //   { name: 'Anonymous', amount: '₹1000', time: '1 day ago', avatar: 'https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&dpr=2' },
+  // ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50">
@@ -317,11 +332,12 @@ razorpay.open();
               <div className="space-y-4">
                 <div className="relative">
                   <div className="w-full bg-gray-200 rounded-full h-4">
-                    <div className="bg-gradient-to-r from-pink-500 to-purple-500 h-4 rounded-full" style={{width: '85%'}}></div>
+                    <div className="bg-gradient-to-r from-pink-500 to-purple-500 h-4 rounded-full" style={{width: '0%'}}></div>
                   </div>
                   <div className="flex justify-between text-sm text-gray-600 mt-2">
-                    <span>coming soon</span>
-                    <span>comming soon</span>
+                    {/* <span>coming soon</span>
+                  
+                    <span>comming soon</span> */}
                   </div>
                 </div>
                 <p className="text-sm text-gray-600">
@@ -334,7 +350,7 @@ razorpay.open();
             <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
               <h3 className="text-lg font-bold text-gray-800 mb-4">Recent Supporters</h3>
               <div className="space-y-4">
-                {recentDonors.map((donor, index) => (
+                {recentDonar.map((donor, index) => (
                   <div key={index} className="flex items-center gap-3">
                     <img
                       src={donor.avatar}
@@ -360,7 +376,7 @@ razorpay.open();
                   className="w-12 h-12 rounded-full"
                 />
                 <div>
-                  <div className="font-semibold text-gray-800">Rajesh Kumar</div>
+                  <div className="font-semibold text-gray-800">Rajesh Kumar[Dummy Account]</div>
                   <div className="flex items-center gap-1">
                     {[...Array(5)].map((_, i) => (
                       <Star key={i} className="w-4 h-4 text-yellow-500 fill-current" />

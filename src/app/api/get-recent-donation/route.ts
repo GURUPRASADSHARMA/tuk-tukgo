@@ -22,11 +22,13 @@ export async function GET(req:NextRequest){
             },
             {$unwind:"$user"},
             {$project:{
-                amount:1,
-                status:1,
-                createdAt:1,
-                "user.name":1,
-                "user.image":1
+                _id:0,
+                name:"$user.name",
+                avatar:"$user.image",
+                amount:{
+                  $concat:["₹",{$toString:"$amount"}]
+                },
+                createdAt:1
             }}
         ])
 
