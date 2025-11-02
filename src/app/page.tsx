@@ -12,7 +12,7 @@ const LandingPage =  () => {
   const [isLoading, setIsLoading] = useState(false);
  const route = useRouter()
  const {data:session}=useSession();
-//  console.log(session)
+
 
   useEffect(() => {
     setIsVisible(true);
