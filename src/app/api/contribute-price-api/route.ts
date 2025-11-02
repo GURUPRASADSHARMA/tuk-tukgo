@@ -21,10 +21,7 @@ export async function POST(request:NextRequest){
         let start = from ;
          const contrbuter = await User.findOneAndUpdate({email:user?.email},
             {
-                $inc:{contributionCount:1},
-                $push:{contribution:[{
-
-                }]}
+                $inc:{contributionCount:1}
             },
             {new:true}
         )
@@ -61,7 +58,7 @@ if(existingRoute){
             to,
             checkpoints,
             segments:segment,
-            email:user?.email
+            email:user?.email,
         })
  
         return NextResponse.json(newPrice,{status:202})

@@ -1,7 +1,10 @@
 "use client"
-import React, { useState } from 'react';
-import { ArrowLeft, Heart, Star, Users, Zap, Check, Gift, Crown } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { ArrowLeft, Heart, Star, Users, Zap, Check, Gift, Crown, Currency } from 'lucide-react';
 import Link from 'next/link';
+import axios from 'axios';
+import Razorpay from 'razorpay';
+
 
 
 
@@ -11,25 +14,102 @@ const Donation = () => {
   const [customAmount, setCustomAmount] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isDonated, setIsDonated] = useState(false);
+  const [raisedAmount,setRaisedAmount] = useState(0);
+  const [donars,setDonars] =useState(0)
+  const predefinedAmounts = [25,50, 100, 250, 500, 1000, 2000];
 
-  const predefinedAmounts = [50, 100, 250, 500, 1000, 2000];
 
+  const donation = async ()=>{
+    const res = await axios.get("/api/get-total-donation");
+    setRaisedAmount(res.data.donation)
+    setDonars(res.data.length)
+  }
+
+const recentContribution=async ()=>{
+  const res = await axios.get("/api/get-recent-contribution")
+  console.log(res)
+}
+
+useEffect(()=>{
+donation();
+
+
+})
+  
   const handleDonate = async () => {
     const amount = selectedAmount || parseInt(customAmount);
     if (!amount || amount <= 0) return;
 
-    setIsProcessing(true);
-    
+
+
+    try {
+      setIsProcessing(true);
+  
+      const {data} = await axios.post("/api/donation",{
+        amount,
+        action:"create"
+      })
+      
+  
+      const {orderId} = data
+      if(!orderId){
+        console.log("Order creation failed")
+       throw new Error("Order creation failed");
+      }
+      const options = {
+        key:process.env.NEXT_PUBLIC_RAZORPAY_API_KEY,
+        amount:amount*100,
+        currency:"INR",
+        name: "Guru Prasad Donations",
+        description: "Support my open-source work ❤️",
+        order_id:orderId,
+        handler: async function (response:any){
+          // response me sab kuch apne app aa jayega when payment is done now using the info in response we verify that payment is done or not
+          const verifyRes = await axios.post("/api/donation",{
+            amount,
+            action:"verify",
+            ...response
+          })
+         if (verifyRes.data.success) {
+            setIsDonated(true);
+            setTimeout(() => {
+              setSelectedAmount(null);
+              setCustomAmount("");
+              setIsDonated(false);
+            }, 3000);
+          } else {
+            alert("Payment verification failed.");
+          }  
+        },
+        theme: {
+        color: "#6366f1", // optional styling
+      },
+      };
+
+      console.log(process.env.NEXT_PUBLIC_RAZORPAY_API_KEY)
+
+const razorpay = new (window as any).Razorpay(options)
+razorpay.open();
+
+    } catch (error) {
+      console.error("Donation failed:", error);
+    alert("Something went wrong. Please try again.");
+    }finally {
+    setIsProcessing(false);
+  }
+
+
+
     // Simulate payment processing
-    setTimeout(() => {
-      setIsProcessing(false);
-      setIsDonated(true);
-      setTimeout(() => {
-        setSelectedAmount(null);
-        setCustomAmount('');
-        setIsDonated(false);
-      }, 3000);
-    }, 2500);
+    // setTimeout(() => {
+    //   setIsProcessing(false);
+    //   setIsDonated(true);
+    //   setTimeout(() => {
+    //     setSelectedAmount(null);
+    //     setCustomAmount('');
+    //     setIsDonated(false);
+    //   }, 3000);
+    // }, 2500);
   };
 
   const features = [
@@ -109,15 +189,15 @@ const Donation = () => {
               {/* Impact Stats */}
               <div className="grid md:grid-cols-3 gap-6 mb-8">
                 <div className="text-center p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl">
-                  <div className="text-3xl font-bold text-blue-600 mb-2">₹25,000</div>
+                  <div className="text-3xl font-bold text-blue-600 mb-2">{raisedAmount}</div>
                   <div className="text-gray-600">Raised This Month</div>
                 </div>
                 <div className="text-center p-6 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl">
-                  <div className="text-3xl font-bold text-green-600 mb-2">150</div>
+                  <div className="text-3xl font-bold text-green-600 mb-2">{donars}</div>
                   <div className="text-gray-600">Generous Donors</div>
                 </div>
                 <div className="text-center p-6 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl">
-                  <div className="text-3xl font-bold text-purple-600 mb-2">85%</div>
+                  <div className="text-3xl font-bold text-purple-600 mb-2">Coming Soon</div>
                   <div className="text-gray-600">Goal Achieved</div>
                 </div>
               </div>
@@ -156,7 +236,7 @@ const Donation = () => {
                       setSelectedAmount(null);
                     }}
                     placeholder="Enter custom amount"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all text-bolder text-black"
                   />
                 </div>
 
@@ -201,7 +281,9 @@ const Donation = () => {
 
             {/* Donor Benefits */}
             <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
-              <h3 className="text-xl font-bold text-gray-800 mb-6">Donor Benefits</h3>
+              <h3 className="text-xl font-bold text-gray-800 mb-6">Donor Benefits [Coming-Soon]
+                it will automatically credited in future
+              </h3>
               <div className="space-y-4">
                 {donorBenefits.map((tier, index) => (
                   <div key={index} className="p-6 bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-100">
@@ -238,12 +320,12 @@ const Donation = () => {
                     <div className="bg-gradient-to-r from-pink-500 to-purple-500 h-4 rounded-full" style={{width: '85%'}}></div>
                   </div>
                   <div className="flex justify-between text-sm text-gray-600 mt-2">
-                    <span>₹25,000</span>
-                    <span>₹30,000</span>
+                    <span>coming soon</span>
+                    <span>comming soon</span>
                   </div>
                 </div>
                 <p className="text-sm text-gray-600">
-                  85% complete • ₹5,000 remaining
+                  {/* 85% complete • ₹5,000 remaining */}
                 </p>
               </div>
             </div>

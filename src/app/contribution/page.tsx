@@ -8,7 +8,14 @@ import { Shield, CheckCircle, AlertCircle } from 'lucide-react';
 
 
 
-
+type Contribution = {
+  from: string;
+  to: string;
+  price: number | string;
+  checkpoints: number;
+  contributor?: string; // optional if you map it
+  time?: string;        // optional if you map createdAt
+};
 
 interface Checkpoint {
   id: string;
@@ -63,6 +70,17 @@ const ContributionPage= () => {
   const [checkpoints, setCheckpoints] = useState<Checkpoint[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [contribution,setContribution]=useState(0);
+
+  const contributioCount = async()=>{
+    try {
+      const res = await axios.post("/api/get-your-contribution")
+      setContribution(res.data.contribution)
+      
+    } catch (error) {
+      console.log("something went wrong during fetching contribution count",error)
+    }
+  }
 
   
 
@@ -92,9 +110,6 @@ const ContributionPage= () => {
   //   const total= checkpoints.reduce((sum,u)=>sum + parseInt(u.price),0) + parseInt(finalPrice)
   //   setTotalPrice(total)
   // },[finalPrice,checkpoints])
-
-
-
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -136,20 +151,28 @@ const ContributionPage= () => {
       return total + (parseFloat(checkpoint.price) || 0);
     }, 0);
   };
-  
-  const recentContributions = [
-    { from: 'MG Road', to: 'Koramangala', price: '₹85', contributor: 'Rahul M.', time: '2 mins ago', checkpoints: 2 },
-    { from: 'Whitefield', to: 'Brigade Road', price: '₹180', contributor: 'Priya S.', time: '5 mins ago', checkpoints: 3 },
-    { from: 'Electronic City', to: 'Indiranagar', price: '₹220', contributor: 'Amit K.', time: '8 mins ago', checkpoints: 1 },
-    { from: 'Hebbal', to: 'Jayanagar', price: '₹160', contributor: 'Sneha R.', time: '12 mins ago', checkpoints: 0 },
-  ];
+  const [recentContributions,setRecentContribution] = useState<Contribution[]>([]);
+  // const recentContributions = [
+  //   { from: 'MG Road', to: 'Koramangala', price: '₹85', contributor: 'Rahul M.', time: '2 mins ago', checkpoints: 2 },
+  //   { from: 'Whitefield', to: 'Brigade Road', price: '₹180', contributor: 'Priya S.', time: '5 mins ago', checkpoints: 3 },
+  //   { from: 'Electronic City', to: 'Indiranagar', price: '₹220', contributor: 'Amit K.', time: '8 mins ago', checkpoints: 1 },
+  //   { from: 'Hebbal', to: 'Jayanagar', price: '₹160', contributor: 'Sneha R.', time: '12 mins ago', checkpoints: 0 },
+  // ];
   
   const topContributors = [
     { name: 'Rajesh Kumar', contributions: 45, avatar: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2' },
     { name: 'Priya Sharma', contributions: 38, avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2' },
     { name: 'Amit Verma', contributions: 32, avatar: 'https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2' },
   ];
-
+  const getRecentcontribution = async()=>{
+    const res = await axios.post("/api/get-recent-contribution");
+    setRecentContribution((prev)=>[...prev,...res.data.data])
+  }
+  useEffect( ()=>{
+    getRecentcontribution();
+    contributioCount();
+  },[])
+  
  
   return (
     <main>
@@ -553,15 +576,15 @@ const ContributionPage= () => {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Contributions</span>
-                  <span className="text-2xl font-bold text-green-600">12</span>
+                  <span className="text-2xl font-bold text-green-600">{contribution}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Helpfulness Score</span>
-                  <span className="text-2xl font-bold text-blue-600">4.8★</span>
+                  <span className="text-2xl font-bold text-blue-600">Coming soon..</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600">Community Rank</span>
-                  <span className="text-2xl font-bold text-purple-600">#15</span>
+                  <span className="text-2xl font-bold text-purple-600">Coming soon..</span>
                 </div>
               </div>
             </div>
@@ -668,7 +691,7 @@ const ContributionPage= () => {
 
               <div>
                 <label htmlFor="reason" className="block text-sm font-medium text-slate-700 mb-2">
-                  Why do you want to become an admin?
+                 Mention the place or region where you’d like to contribute.
                 </label>
                 <textarea
                   id="reason"
@@ -677,7 +700,7 @@ const ContributionPage= () => {
                   required
                   rows={4}
                   className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all text-slate-800 placeholder:text-slate-400 resize-none"
-                  placeholder="Tell us about your interest in contributing..."
+                  placeholder="Mention the place or region where you’d like to contribute. like city or famous landmark like around India-Gate or any other"
                 />
               </div>
 

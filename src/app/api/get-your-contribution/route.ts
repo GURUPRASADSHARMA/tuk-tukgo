@@ -17,7 +17,7 @@ export async function POST(request:NextRequest){
         return NextResponse.json({message:"user not found during getting contribution"})
     }
     
-    return NextResponse.json({message:"contribution fetched successfully",contribtion:user.contributionCount})
+    return NextResponse.json({message:"contribution fetched successfully",contribution:user.contributionCount})
 
     } catch (error) {
         console.log("something went wrong during getting contribution",error)

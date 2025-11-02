@@ -10,7 +10,8 @@ export interface User{
    createdAt:Date,
    contribution?:[],
    isAdmin:boolean
-   contributionCount?:number
+   contributionCount?:number,
+   donation?:number
 }
 
 // export interface Contribution{
@@ -51,7 +52,6 @@ const userSchema :Schema<User> = new Schema({
         name:{
             type:String,
             required:true,
-            unique:true
         },
 
         email:{
@@ -76,6 +76,10 @@ const userSchema :Schema<User> = new Schema({
         isAdmin:{
             type:Boolean,
             default:false
+        },
+        donation:{
+            type:Number,
+            default:0
         }
 },)
 
