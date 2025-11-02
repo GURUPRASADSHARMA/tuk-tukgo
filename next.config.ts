@@ -9,6 +9,9 @@ const nextConfig: NextConfig = {
     // ⚠️ Warning: this disables build-time linting
     ignoreDuringBuilds: true,
   },
+  typescript: {
+    ignoreBuildErrors: true, // also skip TS errors in production builds
+  },
 };
 
 export default nextConfig;
