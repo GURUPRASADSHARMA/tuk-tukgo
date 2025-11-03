@@ -12,13 +12,8 @@ export async function POST(request:NextRequest){
     try {
 
         const reqBody = await request.json();
-        const {from ,to} = reqBody        
-        const price = await Price.findOne({
-            $and:[
-               { $or:[{"segments.from":from},{"segments.to":from}]},
-               { $or:[{"segments.from":to},{"segments.to":to}]}
-            ]
-        })
+        const {from ,to} = reqBody       
+        const price = await Price.findOne({ $and: [ { $or: [ { "segments.from": { $regex: from, $options: "i" } }, { "segments.to": { $regex: from, $options: "i" } } ] }, { $or: [ { "segments.from": { $regex: to, $options: "i" } }, { "segments.to": { $regex: to, $options: "i" } } ] } ] });
         if(!price){
             return NextResponse.json({message:"no price or data available for required route,sorry for inconveniance"},{status:500})
         }

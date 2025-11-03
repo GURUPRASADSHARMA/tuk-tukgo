@@ -30,8 +30,8 @@ const Dashboard= () => {
     
     setIsCalculating(true);
    const res = await axios.post('/api/get-fair-price',{
-    from,
-    to
+    from:from.trim().toLowerCase(),
+    to:to.trim().toLowerCase()
    })
    console.log(res)
     

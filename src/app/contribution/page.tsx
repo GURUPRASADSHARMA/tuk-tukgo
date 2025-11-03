@@ -117,8 +117,8 @@ const ContributionPage= () => {
     setIsSubmitting(true);    
 
     const data = {
-      from,
-      to,
+      from:from.trim().toLowerCase(),
+      to:to.trim().toLowerCase(),
       finalPrice:parseInt(finalPrice),
       checkpoints:checkpoints.map((obj)=>({
         ...obj,

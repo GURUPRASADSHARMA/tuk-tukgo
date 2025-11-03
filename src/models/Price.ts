@@ -22,60 +22,68 @@ export interface Price extends Document {
 }
 
 
-const PriceSchema: Schema<Price> = new mongoose.Schema({
+const PriceSchema: Schema<Price> = new mongoose.Schema(
+  {
+    from: {
+      type: String,
+      required: true,
+      set: (v: string) => v.trim().toLowerCase(),
+    },
+    to: {
+      type: String,
+      required: true,
+      set: (v: string) => v.trim().toLowerCase(),
+    },
 
-        from:{
-            type:String,
-            required:true
+    checkpoints: [
+      {
+        id: {
+          type: String,
+          required: true,
         },
-        to:{
-            type:String,
-            required:true
+        location: {
+          type: String,
+          required: true,
+          set: (v: string) => v.trim().toLowerCase(),
         },
+        price: {
+          type: Number,
+          required: true,
+        },
+      },
+    ],
 
-        checkpoints:[
-            {   
-                id:{
-                type:String,
-                required:true
-                },
+    segments: [
+      {
+        from: {
+          type: String,
+          required: true,
+          set: (v: string) => v.trim().toLowerCase(),
+        },
+        to: {
+          type: String,
+          required: true,
+          set: (v: string) => v.trim().toLowerCase(),
+        },
+        price: {
+          type: Number,
+          required: true,
+        },
+      },
+    ],
 
-                location:{
-                    type:String,
-                    required:true
-                },
+    email: {
+      type: String,
+      required: true,
+      set: (v: string) => v.trim().toLowerCase(),
+    },
+  },
+  { timestamps: true }
+);
 
-                price:{
-                    type:Number,
-                    required:true
-                }
-            }
-        ],
-        segments:[
-            {
-                from:{
-                    type:String,
-                    required:true
-                },
-                to:{
-                    type:String,
-                    required:true
-                },
-                price:{
-                    type:Number,
-                    required:true
-                }
-            }
-        ],
+export const Price =
+  (mongoose.models.Price as mongoose.Model<Price>) ||
+  mongoose.model<Price>("Price", PriceSchema);
 
-        email:{
-            type:String,
-            required:true
-
-        }
-
-},{timestamps:true})
-
-export const Price = (mongoose.models.Price as mongoose.Model<Price> ||mongoose.model<Price>("Price",PriceSchema))
 
 // (mongoose.models.User as mongoose.Model<User> || mongoose.model<User>("User",userSchema))

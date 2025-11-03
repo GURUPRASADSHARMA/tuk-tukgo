@@ -19,7 +19,7 @@ export async function POST(request:NextRequest){
         const {from ,to,checkpoints,finalPrice}=reqBody
         const segment = [];
         let start = from ;
-         const contrbuter = await User.findOneAndUpdate({email:user?.email},
+          await User.findOneAndUpdate({email:user?.email},
             {
                 $inc:{contributionCount:1}
             },
