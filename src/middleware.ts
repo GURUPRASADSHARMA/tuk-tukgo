@@ -16,7 +16,9 @@ export async function middleware(req:NextRequest){
         url.pathname.startsWith('/dashboard')||
         url.pathname.startsWith('/contribution')||
         url.pathname.startsWith('/donation')||
-        url.pathname.startsWith('/tripplanner')
+        url.pathname.startsWith('/tripplanner')||
+        url.pathname.startsWith('/donation')||
+        url.pathname.startsWith('/donation-status')
     )){
         return NextResponse.redirect(new URL('/',req.url))
     }
