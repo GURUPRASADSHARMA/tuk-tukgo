@@ -13,9 +13,6 @@ interface recentDonar{
   time:string
 }
 
-
-
-
 const Donation = () => {
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [customAmount, setCustomAmount] = useState('');
@@ -34,7 +31,7 @@ const Donation = () => {
   }
 
 const recentContribution=async ()=>{
-  const res = await axios.get("/api/get-recent-contribution")
+  const res = await axios.get("/api/get-recent-donation")
   const {donars}=res.data
   const formattedData = donars.map((obj:any)=>({
     name:obj.name,
@@ -48,84 +45,49 @@ const recentContribution=async ()=>{
 
 useEffect(()=>{
 donation();
-recentContribution()
-})
+recentContribution();
+},[])
   
-  const handleDonate = async () => {
-    const amount = selectedAmount || parseInt(customAmount);
-    if (!amount || amount <= 0) return;
+const handleDonate = async () => {
+  const amount = selectedAmount || parseInt(customAmount);
+  if (!amount || amount <= 0) return;
 
+  try {
+    setIsProcessing(true);
 
+    const { data } = await axios.post("/api/donation", {
+      amount,
+      name: "Supporter",
+      email: "test@example.com",
+    });
 
-    try {
-      setIsProcessing(true);
-  
-      const {data} = await axios.post("/api/donation",{
-        amount,
-        action:"create"
-      })
-      
-  
-      const {orderId} = data
-      if(!orderId){
-        console.log("Order creation failed")
-       throw new Error("Order creation failed");
-      }
-      const options = {
-        key:process.env.NEXT_PUBLIC_RAZORPAY_API_KEY,
-        amount:amount*100,
-        currency:"INR",
-        name: "Guru Prasad Donations",
-        description: "Support my open-source work ❤️",
-        order_id:orderId,
-        handler: async function (response:any){
-          // response me sab kuch apne app aa jayega when payment is done now using the info in response we verify that payment is done or not
-          const verifyRes = await axios.post("/api/donation",{
-            amount,
-            action:"verify",
-            ...response
-          })
-         if (verifyRes.data.success) {
-            setIsDonated(true);
-            setTimeout(() => {
-              setSelectedAmount(null);
-              setCustomAmount("");
-              setIsDonated(false);
-            }, 3000);
-          } else {
-            alert("Payment verification failed.");
-          }  
-        },
-        theme: {
-        color: "#6366f1", // optional styling
-      },
-      };
+    if (data.success && data.payuData) {
+   
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = data.payuData.action;
 
-      console.log(process.env.NEXT_PUBLIC_RAZORPAY_API_KEY)
+      Object.entries(data.payuData).forEach(([key, value]) => {
+        if (key === "action") return; 
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = key;
+        input.value = value as string;
+        form.appendChild(input);
+      });
 
-const razorpay = new (window as any).Razorpay(options)
-razorpay.open();
-
-    } catch (error) {
-      console.error("Donation failed:", error);
+      document.body.appendChild(form);
+      form.submit(); 
+    } else {
+      alert("Failed to initiate payment. Please try again.");
+    }
+  } catch (error) {
+    console.error("Donation failed:", error);
     alert("Something went wrong. Please try again.");
-    }finally {
+  } finally {
     setIsProcessing(false);
   }
-
-
-
-    // Simulate payment processing
-    // setTimeout(() => {
-    //   setIsProcessing(false);
-    //   setIsDonated(true);
-    //   setTimeout(() => {
-    //     setSelectedAmount(null);
-    //     setCustomAmount('');
-    //     setIsDonated(false);
-    //   }, 3000);
-    // }, 2500);
-  };
+};
 
   const features = [
     {
@@ -151,11 +113,7 @@ razorpay.open();
     { tier: 'Legend', amount: 1000, benefits: ['All Champion benefits', 'Monthly reports', 'Feature requests'], icon: <Crown className="w-5 h-5 text-purple-500" /> },
   ];
 
-  // const recentDonors = [
-  //   { name: 'Rahul M.', amount: '₹500', time: '2 hours ago', avatar: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&dpr=2' },
-  //   { name: 'Priya S.', amount: '₹250', time: '5 hours ago', avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&dpr=2' },
-  //   { name: 'Anonymous', amount: '₹1000', time: '1 day ago', avatar: 'https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&dpr=2' },
-  // ];
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50">

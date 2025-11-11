@@ -8,6 +8,10 @@ export async function middleware(req:NextRequest){
     const token = await getToken({req,secret:process.env.NEXTAUTH_SECRET})
     const url = new URL(req.url)
 
+    if (url.pathname.startsWith("/api/donation/webhook")) {
+    return NextResponse.next();
+  }
+
     if(!token && (
         url.pathname.startsWith('/dashboard')||
         url.pathname.startsWith('/contribution')||

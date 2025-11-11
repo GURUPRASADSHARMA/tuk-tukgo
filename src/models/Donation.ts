@@ -1,41 +1,49 @@
-import mongoose ,{Mongoose, ObjectId, Schema}from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 
-
-interface Donation{
-    userId:mongoose.Types.ObjectId,
-    amount:number,
-    razorpayOrderId:string,
-    status:string,
-    createdAt:Date
+export interface Donation extends Document {
+  userId: mongoose.Types.ObjectId;
+  amount: number;
+  gateway: "payu" | "razorpay" | "manual";
+  transactionId: string;      
+  paymentStatus: "pending" | "success" | "failed";
+  paymentResponse?: object;    
+  createdAt: Date;
 }
 
-
-const donationSchema:Schema<Donation> = new mongoose.Schema({
-    userId:{
-        type:Schema.Types.ObjectId,
-        refrence:"User",
-        required:true
-    },
-    amount:{
-        type:Number,
-        required:true
-    },
-    razorpayOrderId:{
-        type:String,
-        required:true
-
-    },
-    status:{
-        type:String,
-        enum:["pending","completed","failed"],
-        default:"pending"
-    },
-    createdAt:{
-        type:Date,
-        default:Date.now
-    }
-})
+const donationSchema = new Schema<Donation>({
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  amount: {
+    type: Number,
+    required: true,
+  },
+  gateway: {
+    type: String,
+    enum: ["payu", "razorpay", "manual"],
+    default: "payu",
+  },
+  transactionId: {
+    type: String,
+    required: true,
+  },
+  paymentStatus: {
+    type: String,
+    enum: ["pending", "success", "failed"],
+    default: "pending",
+  },
+  paymentResponse: {
+    type: Object,
+    default: {},
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
 
 export const Donation =
-  (mongoose.models.Donation as mongoose.Model<Donation>) ||
+  mongoose.models.Donation ||
   mongoose.model<Donation>("Donation", donationSchema);
