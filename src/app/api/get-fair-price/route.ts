@@ -44,8 +44,8 @@ else {
   }
 
   // Walk the path forward (to -> from) then flip edges
-  const data = price.segments.slice(start,end+1);
-  const requiredData = data
+  const dataObject = price.segments.slice(start,end+1);
+  const data = dataObject
     .reverse()
     .map((seg)=>({
       from: seg.to,
@@ -53,9 +53,9 @@ else {
       price: seg.price
     }));
 
-  const totalPrice = requiredData.reduce((sum,seg)=>sum+seg.price,0);
+  const totalPrice = data.reduce((sum,seg)=>sum+seg.price,0);
 
-  return NextResponse.json({totalPrice,requiredData},{status:201});
+  return NextResponse.json({totalPrice,data},{status:201});
 }
 
 

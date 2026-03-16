@@ -33,20 +33,12 @@ const Dashboard= () => {
     from:from.trim().toLowerCase(),
     to:to.trim().toLowerCase()
    })
-   console.log(res)
+  
     
     // Simulate fare calculation
     setTimeout(() => {
-      // Simulate server response with segments
-      const mockSegments = [
-        { from: from, to: "Junction Point", price: Math.floor(Math.random() * 50) + 30 },
-        { from: "Junction Point", to: "Main Road", price: Math.floor(Math.random() * 40) + 25 },
-        { from: "Main Road", to: to, price: Math.floor(Math.random() * 60) + 35 }
-      ];
-      
-      // Sometimes return direct route (no intermediate stops)
       const segments = res.data.data
-      
+      console.log(segments)
       const totalFare = res.data.totalPrice;
       
       setFareResult({
@@ -60,6 +52,7 @@ const Dashboard= () => {
   async function handleLogout(){
     signOut();
   }
+
 
   const popularRoutes = [
     { from: 'MMMUT', to: 'Golghar', fare: '₹20' },
